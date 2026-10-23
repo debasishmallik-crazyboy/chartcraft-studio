@@ -956,13 +956,8 @@
     }
   }
 
-  // 4. Export Apple ProRes 4444 (.MOV) via Local FFmpeg Daemon
+  // 4. Export QuickTime Transparent MOV (.MOV) — Dual-Mode (Local Server or In-Browser)
   async function runProresMovExport() {
-    if (!isServerAvailable) {
-      alert('ProRes 4444 hardware rendering requires the local Node.js daemon ("node server.js").\n\nOn static web hosting, please use the "Transparent PNG Sequence (.ZIP)" or "Alpha Video (.WEBM)" buttons, which work 100% in browser and import into Filmora, Premiere, and CapCut with full transparency!');
-      return;
-    }
-
     const progressBox = document.getElementById('exportProgressBox');
     const statusText = document.getElementById('exportStatusText');
     const progressBar = document.getElementById('exportProgressBar');
@@ -972,42 +967,88 @@
     progressBox.style.display = 'block';
     progressBar.style.width = '0%';
     percentText.textContent = '0%';
-    statusText.textContent = 'Initializing local FFmpeg render session...';
 
     const totalFrames = getTotalFrames();
-    const exportConfig = { ...state, width: 1920, height: 1080, totalFrames };
+    const exportConfig = { ...state, width: 1920, height: 1080, totalFrames, bgMode: 'transparent' };
 
+    // MODE A: LOCAL NODE SERVER RUNNING (Hardware ProRes 4444 via FFmpeg)
+    if (isServerAvailable) {
+      statusText.textContent = 'Initializing local FFmpeg render session...';
+
+      try {
+        const startRes = await fetch('/api/render-session/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(exportConfig)
+        });
+        const startData = await startRes.json();
+        if (startData.success) {
+          const sessionId = startData.sessionId;
+          lastProjectDir = startData.projectDir;
+          statusText.textContent = 'Streaming frames to local ProRes 4444 encoder...';
+
+          for (let f = 0; f <= totalFrames; f++) {
+            ChartEngine.renderFrame(exportCtx, 1920, 1080, f, totalFrames, exportConfig);
+            const imgData = exportCtx.getImageData(0, 0, 1920, 1080);
+            const rawBytes = new Uint8Array(imgData.data.buffer);
+
+            const chunkRes = await fetch('/api/render-session/chunk', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/octet-stream',
+                'X-Session-Id': sessionId,
+                'X-Frame-Index': f.toString()
+              },
+              body: rawBytes
+            });
+            if (!chunkRes.ok) throw new Error(`Error uploading frame ${f}`);
+
+            const pct = Math.round((f / totalFrames) * 100);
+            progressBar.style.width = `${pct}%`;
+            percentText.textContent = `${pct}%`;
+            frameCounter.textContent = `Frame ${f} / ${totalFrames}`;
+
+            if (f % 5 === 0) await new Promise(r => setTimeout(r, 1));
+          }
+
+          statusText.textContent = 'Finalizing Apple ProRes 4444 (.mov) file...';
+          const finishRes = await fetch('/api/render-session/finish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId })
+          });
+          const finishData = await finishRes.json();
+
+          if (finishData.success) {
+            statusText.textContent = '🎉 ProRes 4444 Video Rendered Successfully!';
+            progressBar.style.width = '100%';
+            const boxPath = document.getElementById('boxServerPath');
+            if (boxPath) {
+              boxPath.style.display = 'flex';
+              document.getElementById('txtExportFolderPath').value = finishData.projectDir;
+            }
+            window.location.href = finishData.movUrl;
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Local server render failed, switching to in-browser MOV export:', err);
+      }
+    }
+
+    // MODE B: 100% IN-BROWSER QUICKTIME MOV EXPORT (For GitHub Pages & InfinityFree)
     try {
-      const startRes = await fetch('/api/render-session/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exportConfig)
-      });
-      const startData = await startRes.json();
-      if (!startData.success) throw new Error(startData.error || 'Failed to initialize FFmpeg');
-
-      const sessionId = startData.sessionId;
-      lastProjectDir = startData.projectDir;
-
-      statusText.textContent = 'Streaming frames to ProRes 4444 encoder...';
+      statusText.textContent = 'Rendering 1080p frames for QuickTime .MOV with Alpha...';
+      const pngBuffers = [];
 
       for (let f = 0; f <= totalFrames; f++) {
         ChartEngine.renderFrame(exportCtx, 1920, 1080, f, totalFrames, exportConfig);
-        const imgData = exportCtx.getImageData(0, 0, 1920, 1080);
-        const rawBytes = new Uint8Array(imgData.data.buffer);
 
-        const chunkRes = await fetch('/api/render-session/chunk', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'X-Session-Id': sessionId,
-            'X-Frame-Index': f.toString()
-          },
-          body: rawBytes
-        });
-        if (!chunkRes.ok) throw new Error(`Error uploading frame ${f}`);
+        const blob = await new Promise(resolve => exportCanvas.toBlob(resolve, 'image/png'));
+        const arrayBuf = await blob.arrayBuffer();
+        pngBuffers.push(new Uint8Array(arrayBuf));
 
-        const pct = Math.round((f / totalFrames) * 100);
+        const pct = Math.round((f / totalFrames) * 85);
         progressBar.style.width = `${pct}%`;
         percentText.textContent = `${pct}%`;
         frameCounter.textContent = `Frame ${f} / ${totalFrames}`;
@@ -1015,28 +1056,32 @@
         if (f % 5 === 0) await new Promise(r => setTimeout(r, 1));
       }
 
-      statusText.textContent = 'Finalizing Apple ProRes 4444 (.mov) file...';
-      const finishRes = await fetch('/api/render-session/finish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId })
-      });
-      const finishData = await finishRes.json();
+      statusText.textContent = 'Muxing 32-bit QuickTime .MOV with Alpha in browser...';
+      progressBar.style.width = '90%';
+      percentText.textContent = '90%';
+      await new Promise(r => setTimeout(r, 20));
 
-      if (finishData.success) {
-        statusText.textContent = '🎉 ProRes 4444 Video Rendered Successfully!';
-        progressBar.style.width = '100%';
-        const boxPath = document.getElementById('boxServerPath');
-        if (boxPath) {
-          boxPath.style.display = 'flex';
-          document.getElementById('txtExportFolderPath').value = finishData.projectDir;
-        }
-        window.location.href = finishData.movUrl;
-      } else {
-        throw new Error(finishData.error || 'FFmpeg failed');
-      }
+      const fps = state.fps || 60;
+      const movBytes = QuickTimeMovBuilder.createQuickTimeMov(pngBuffers, 1920, 1080, fps);
+      const movBlob = new Blob([movBytes], { type: 'video/quicktime' });
+
+      progressBar.style.width = '100%';
+      percentText.textContent = '100%';
+      statusText.textContent = '🎉 Transparent QuickTime .MOV Downloaded Successfully!';
+
+      const dlUrl = URL.createObjectURL(movBlob);
+      const a = document.createElement('a');
+      a.href = dlUrl;
+      const sanitizedTitle = (state.title || 'chart').trim().replace(/[^a-zA-Z0-9_\-\u0980-\u09FF]/g, '_');
+      a.download = `${sanitizedTitle}_transparent.mov`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(dlUrl), 30000);
+
     } catch (err) {
-      statusText.textContent = `❌ Error: ${err.message}`;
+      statusText.textContent = `❌ Error exporting MOV: ${err.message}`;
+      console.error(err);
     }
   }
 
