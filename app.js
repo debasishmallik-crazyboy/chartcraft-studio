@@ -121,10 +121,14 @@
       badge.style.color = '#10B981';
     }
     const proresStatus = document.getElementById('badgeProresStatus');
-    if (proresStatus) proresStatus.textContent = 'Requires Local Node';
+    if (proresStatus) proresStatus.textContent = 'In-Browser QuickTime';
     const descProres = document.getElementById('descProres');
     if (descProres) {
-      descProres.textContent = 'Run "node server.js" locally for hardware ProRes 4444 encoding. On web hosting, download the Transparent PNG Sequence (.ZIP) or Alpha WebM above!';
+      descProres.textContent = 'Direct .MOV with 100% straight alpha channel. Rendered client-side in browser for Filmora, Premiere & CapCut!';
+    }
+    const btnMov = document.getElementById('btnTriggerMovDl');
+    if (btnMov) {
+      btnMov.textContent = 'Download Transparent (.mov)';
     }
   }
 

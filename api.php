@@ -2,6 +2,12 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, X-Session-Id, X-Frame-Index');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
@@ -21,6 +27,17 @@ if ($action === 'sample_bengali_csv') {
 
 echo json_encode([
     'success' => true,
-    'message' => 'ChartCraft Studio API online',
+    'status' => 'online',
+    'version' => '1.2.0',
+    'app' => 'ChartCraft Studio',
+    'host' => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'unknown',
+    'php_version' => PHP_VERSION,
+    'capabilities' => [
+        'in_browser_mov' => true,
+        'alpha_webm' => true,
+        'png_sequence_zip' => true,
+        'bengali_google_fonts' => true,
+        'utf8_csv_bengali' => true
+    ],
     'projects' => []
-]);
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
