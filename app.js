@@ -100,35 +100,50 @@
     }
   }
 
+  function setServerMode() {
+    isServerAvailable = true;
+    const badge = document.getElementById('hostModeBadge');
+    if (badge) {
+      badge.textContent = '⚡ SERVER MODE';
+      badge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+      badge.style.color = '#38BDF8';
+    }
+    const proresStatus = document.getElementById('badgeProresStatus');
+    if (proresStatus) proresStatus.textContent = 'Ready (FFmpeg)';
+  }
+
+  function setWebHostingMode() {
+    isServerAvailable = false;
+    const badge = document.getElementById('hostModeBadge');
+    if (badge) {
+      badge.textContent = '🌐 WEB HOSTING';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      badge.style.color = '#10B981';
+    }
+    const proresStatus = document.getElementById('badgeProresStatus');
+    if (proresStatus) proresStatus.textContent = 'Requires Local Node';
+    const descProres = document.getElementById('descProres');
+    if (descProres) {
+      descProres.textContent = 'Run "node server.js" locally for hardware ProRes 4444 encoding. On web hosting, download the Transparent PNG Sequence (.ZIP) or Alpha WebM above!';
+    }
+  }
+
   // --- CHECK SERVER STATUS (DUAL-MODE) ---
   async function checkServerStatus() {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocal) {
+      setWebHostingMode();
+      return;
+    }
     try {
       const res = await fetch('/api/projects', { method: 'GET' });
       if (res.ok) {
-        isServerAvailable = true;
-        const badge = document.getElementById('hostModeBadge');
-        if (badge) {
-          badge.textContent = '⚡ SERVER MODE';
-          badge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
-          badge.style.color = '#38BDF8';
-        }
-        const proresStatus = document.getElementById('badgeProresStatus');
-        if (proresStatus) proresStatus.textContent = 'Ready (FFmpeg)';
+        setServerMode();
+      } else {
+        setWebHostingMode();
       }
     } catch (e) {
-      isServerAvailable = false;
-      const badge = document.getElementById('hostModeBadge');
-      if (badge) {
-        badge.textContent = '🌐 WEB MODE';
-        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-        badge.style.color = '#10B981';
-      }
-      const proresStatus = document.getElementById('badgeProresStatus');
-      if (proresStatus) proresStatus.textContent = 'Requires Local Node';
-      const descProres = document.getElementById('descProres');
-      if (descProres) {
-        descProres.textContent = 'Run "node server.js" locally for hardware ProRes 4444 encoding. For web hosting, use PNG Sequence ZIP or Alpha WebM above!';
-      }
+      setWebHostingMode();
     }
   }
 
@@ -808,6 +823,7 @@
 
   // --- UNIVERSAL EXPORT MODAL & CLIENT-SIDE + SERVER EXPORTS ---
   function openExportModal() {
+    saveProjectToLocal(state);
     const modal = document.getElementById('exportModal');
     const modalFooter = document.getElementById('exportModalFooter');
     const successCard = document.getElementById('exportSuccessCard');
@@ -1051,6 +1067,58 @@ Resolution: ${w}x${h} @ ${fps} FPS
 `;
   }
 
+  function saveProjectToLocal(config) {
+    try {
+      const stored = JSON.parse(localStorage.getItem('chartcraft_saved_projects') || '[]');
+      const filtered = stored.filter(p => (p.config && p.config.name !== config.name));
+      filtered.unshift({
+        folderName: config.name,
+        config: JSON.parse(JSON.stringify(config)),
+        updatedAt: new Date().toISOString()
+      });
+      localStorage.setItem('chartcraft_saved_projects', JSON.stringify(filtered.slice(0, 30)));
+    } catch (e) {}
+  }
+
+  function loadProjectState(config) {
+    Object.assign(state, config);
+    document.getElementById('projectName').value = state.name;
+    document.getElementById('inpTitle').value = state.title;
+    document.getElementById('inpSubtitle').value = state.subtitle || '';
+    document.getElementById('inpDuration').value = state.duration;
+    document.getElementById('lblDuration').textContent = `${state.duration.toFixed(1)}s`;
+    document.getElementById('selFps').value = state.fps;
+    document.getElementById('selPalette').value = state.palette;
+    if (state.fontFamily) document.getElementById('selFontFamily').value = state.fontFamily;
+    if (state.bgMode) document.getElementById('selBgMode').value = state.bgMode;
+    if (state.bengaliNumerals !== undefined) document.getElementById('chkBengaliDigits').checked = state.bengaliNumerals;
+
+    if (state.titleSize) {
+      document.getElementById('inpTitleSize').value = state.titleSize;
+      document.getElementById('lblTitleSize').textContent = `${state.titleSize}px`;
+    }
+    if (state.valSize) {
+      document.getElementById('inpValSize').value = state.valSize;
+      document.getElementById('lblValSize').textContent = `${state.valSize}px`;
+    }
+    if (state.axisSize) {
+      document.getElementById('inpAxisSize').value = state.axisSize;
+      document.getElementById('lblAxisSize').textContent = `${state.axisSize}px`;
+    }
+    if (state.legendSize) {
+      document.getElementById('inpLegendSize').value = state.legendSize;
+      document.getElementById('lblLegendSize').textContent = `${state.legendSize}px`;
+    }
+
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === state.type);
+    });
+    document.getElementById('badgeCurrentType').textContent = TYPE_NAMES[state.type] || state.type;
+    renderDataTable();
+    updateTimelineLimits();
+    drawCurrentFrame();
+  }
+
   // --- PROJECTS LIST ---
   async function openProjectsModal() {
     const modal = document.getElementById('projectsModal');
@@ -1058,67 +1126,61 @@ Resolution: ${w}x${h} @ ${fps} FPS
     container.innerHTML = '<p>Loading saved projects...</p>';
     modal.classList.add('active');
 
-    try {
-      const res = await fetch('/api/projects');
-      const data = await res.json();
-      if (!data.projects || !data.projects.length) {
-        container.innerHTML = '<p style="color: var(--text-muted); grid-column: span 2;">No past exports found yet.</p>';
-        return;
-      }
+    let projects = [];
 
-      container.innerHTML = '';
-      data.projects.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'project-item';
-        item.innerHTML = `
-          <div class="project-title">${escapeHtml(p.config.title || p.folderName)}</div>
-          <div class="project-meta">Type: ${TYPE_NAMES[p.config.type] || p.config.type} • ${p.config.duration}s @ ${p.config.fps} FPS</div>
-          <div class="project-meta" style="margin-top: 4px; color: #3B82F6;">Click to Reload & Re-edit</div>
-        `;
-        item.addEventListener('click', () => {
-          Object.assign(state, p.config);
-          document.getElementById('projectName').value = state.name;
-          document.getElementById('inpTitle').value = state.title;
-          document.getElementById('inpSubtitle').value = state.subtitle || '';
-          document.getElementById('inpDuration').value = state.duration;
-          document.getElementById('lblDuration').textContent = `${state.duration.toFixed(1)}s`;
-          document.getElementById('selFps').value = state.fps;
-          document.getElementById('selPalette').value = state.palette;
-          if (state.fontFamily) document.getElementById('selFontFamily').value = state.fontFamily;
-          if (state.bgMode) document.getElementById('selBgMode').value = state.bgMode;
-          if (state.bengaliNumerals !== undefined) document.getElementById('chkBengaliDigits').checked = state.bengaliNumerals;
-
-          if (state.titleSize) {
-            document.getElementById('inpTitleSize').value = state.titleSize;
-            document.getElementById('lblTitleSize').textContent = `${state.titleSize}px`;
-          }
-          if (state.valSize) {
-            document.getElementById('inpValSize').value = state.valSize;
-            document.getElementById('lblValSize').textContent = `${state.valSize}px`;
-          }
-          if (state.axisSize) {
-            document.getElementById('inpAxisSize').value = state.axisSize;
-            document.getElementById('lblAxisSize').textContent = `${state.axisSize}px`;
-          }
-          if (state.legendSize) {
-            document.getElementById('inpLegendSize').value = state.legendSize;
-            document.getElementById('lblLegendSize').textContent = `${state.legendSize}px`;
-          }
-
-          document.querySelectorAll('.type-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.type === state.type);
-          });
-          document.getElementById('badgeCurrentType').textContent = TYPE_NAMES[state.type] || state.type;
-          renderDataTable();
-          updateTimelineLimits();
-          drawCurrentFrame();
-          modal.classList.remove('active');
-        });
-        container.appendChild(item);
-      });
-    } catch (err) {
-      container.innerHTML = '<p style="color: var(--text-muted); grid-column: span 2;">Saved projects list requires local node daemon.</p>';
+    // If local server is available, fetch from server API
+    if (isServerAvailable) {
+      try {
+        const res = await fetch('/api/projects');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.projects) projects = data.projects;
+        }
+      } catch (err) {}
     }
+
+    // Always merge or fallback to localStorage projects (essential for web hosting)
+    try {
+      const stored = localStorage.getItem('chartcraft_saved_projects');
+      if (stored) {
+        const localList = JSON.parse(stored);
+        if (localList && localList.length) {
+          if (!projects.length) {
+            projects = localList;
+          } else {
+            // merge unique by name
+            const names = new Set(projects.map(p => p.config ? p.config.name : p.folderName));
+            localList.forEach(lp => {
+              const n = lp.config ? lp.config.name : lp.folderName;
+              if (!names.has(n)) projects.push(lp);
+            });
+          }
+        }
+      }
+    } catch (e) {}
+
+    if (!projects.length) {
+      container.innerHTML = '<p style="color: var(--text-muted); grid-column: span 2;">No past projects found yet. Any chart you edit or export is automatically saved!</p>';
+      return;
+    }
+
+    container.innerHTML = '';
+    projects.forEach(p => {
+      const cfg = p.config || p;
+      const title = cfg.title || p.folderName || 'Untitled Chart';
+      const item = document.createElement('div');
+      item.className = 'project-item';
+      item.innerHTML = `
+        <div class="project-title">${escapeHtml(title)}</div>
+        <div class="project-meta">Type: ${TYPE_NAMES[cfg.type] || cfg.type} • ${cfg.duration}s @ ${cfg.fps || 60} FPS</div>
+        <div class="project-meta" style="margin-top: 4px; color: #3B82F6;">Click to Reload & Re-edit</div>
+      `;
+      item.addEventListener('click', () => {
+        loadProjectState(cfg);
+        modal.classList.remove('active');
+      });
+      container.appendChild(item);
+    });
   }
 
   function escapeHtml(str) {
