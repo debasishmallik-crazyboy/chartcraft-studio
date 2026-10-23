@@ -1,0 +1,29 @@
+{
+  "name": "chartcraft-studio",
+  "version": "1.1.0",
+  "description": "Open-Source Animated Chart Studio with transparent video and PNG export for Filmora, Premiere Pro, CapCut, and DaVinci Resolve",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "animated-charts",
+    "filmora",
+    "premiere-pro",
+    "capcut",
+    "after-effects",
+    "prores4444",
+    "motion-graphics",
+    "bengali-fonts",
+    "video-editing",
+    "alpha-transparency",
+    "github-pages"
+  ],
+  "author": "Antigravity Open Source Community",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/chartcraft-studio.git"
+  }
+}

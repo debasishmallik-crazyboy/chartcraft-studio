@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="bn,en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ChartCraft Studio — Animated Charts with Transparent Alpha for Filmora, Premiere & CapCut</title>
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Google Fonts: English & Top Bengali Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@400;600;700&family=Galada&family=Hind+Siliguri:wght@400;500;600;700&family=Mina:wght@400;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+  <!-- TOP APP HEADER -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-badge" id="hostModeBadge">⚡ STUDIO</div>
+      <div class="brand-title">Chart<span>Craft</span> Studio</div>
+      <div class="brand-subtitle">Filmora • Premiere Pro • CapCut • After Effects • DaVinci</div>
+    </div>
+
+    <div class="project-bar">
+      <input type="text" id="projectName" value="Quarterly_Revenue_Growth" title="Project Name" placeholder="Project Name">
+      <button id="btnProjectsModal" class="btn btn-secondary">📂 Projects</button>
+      <button id="btnResetAll" class="btn btn-outline" title="Reset all settings to default">🔄 Reset</button>
+    </div>
+
+    <div class="action-bar">
+      <button id="btnAutoFitHeader" class="btn btn-accent" title="Auto-detect best chart type based on current data">
+        ✨ Best-Fit
+      </button>
+      <button id="btnExport" class="btn btn-primary">
+        <span class="icon">🎬</span> Export Video / PNG
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE VIEW TABS (Visible on phones & tablets) -->
+  <nav class="mobile-tabs-bar" id="mobileTabsBar">
+    <button class="mobile-tab-btn active" data-tab="preview">
+      <span class="tab-icon">📊</span> প্রিভিউ (Preview)
+    </button>
+    <button class="mobile-tab-btn" data-tab="controls">
+      <span class="tab-icon">⚙️</span> সেটিংস (Controls)
+    </button>
+    <button class="mobile-tab-btn" data-tab="data">
+      <span class="tab-icon">📋</span> ডেটা টেবিল (Data)
+    </button>
+  </nav>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="app-main">
+    <!-- LEFT SIDEBAR: CONTROLS -->
+    <aside class="sidebar" id="sidebarContainer">
+      <!-- 10 CHART VARIATIONS -->
+      <div class="sidebar-section">
+        <div class="section-title-row">
+          <h3>📊 Chart Variations (10 Types)</h3>
+          <button id="btnAutoFitSidebar" class="badge-autofit" title="Auto-select best chart for current data">✨ Auto-Fit</button>
+        </div>
+        <div class="chart-type-grid">
+          <button class="type-btn active" data-type="bar" title="Standard Vertical Columns">
+            <span class="type-icon">📊</span>
+            <span>Column Bar</span>
+          </button>
+          <button class="type-btn" data-type="h_bar" title="Horizontal Ranked Bars">
+            <span class="type-icon">📶</span>
+            <span>Horizontal Bar</span>
+          </button>
+          <button class="type-btn" data-type="grouped_bar" title="Side-by-Side Comparison Bars">
+            <span class="type-icon">👬</span>
+            <span>Grouped Bar</span>
+          </button>
+          <button class="type-btn" data-type="stacked_bar" title="Stacked Segment Columns">
+            <span class="type-icon">🥞</span>
+            <span>Stacked Bar</span>
+          </button>
+          <button class="type-btn" data-type="line" title="Smooth Spline Curve with Neon Points">
+            <span class="type-icon">📈</span>
+            <span>Smooth Line</span>
+          </button>
+          <button class="type-btn" data-type="area" title="Filled Gradient Wave Curve">
+            <span class="type-icon">🌊</span>
+            <span>Gradient Area</span>
+          </button>
+          <button class="type-btn" data-type="donut" title="Hollow Center with Summary Value">
+            <span class="type-icon">🍩</span>
+            <span>Donut Chart</span>
+          </button>
+          <button class="type-btn" data-type="pie" title="Classic Full Circle Wedges">
+            <span class="type-icon">🥧</span>
+            <span>Classic Pie</span>
+          </button>
+          <button class="type-btn" data-type="radial" title="Apple Watch Style Progress Rings">
+            <span class="type-icon">🎯</span>
+            <span>Radial Rings</span>
+          </button>
+          <button class="type-btn" data-type="race" title="Timeline Dynamic Ranking Bar Race">
+            <span class="type-icon">🏁</span>
+            <span>Bar Chart Race</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TYPOGRAPHY & BENGALI FONTS (NEW & ENHANCED) -->
+      <div class="sidebar-section">
+        <h3>🔤 Typography & Fonts (বাংলা ও ইংরেজি)</h3>
+        
+        <!-- Font Family Selector -->
+        <div class="control-row">
+          <label for="selFontFamily">Font Family (ফন্ট নির্বাচন):</label>
+          <select id="selFontFamily">
+            <optgroup label="বাংলা ফন্ট (Bengali Fonts)">
+              <option value="'Noto Sans Bengali', sans-serif" selected>Noto Sans Bengali (নূটো সান্স)</option>
+              <option value="'Hind Siliguri', sans-serif">Hind Siliguri (হিন্দ শিলিগুড়ি)</option>
+              <option value="'Tiro Bangla', serif">Tiro Bangla (তিরো বাংলা - Serif)</option>
+              <option value="'Anek Bangla', sans-serif">Anek Bangla (অনেক বাংলা)</option>
+              <option value="'Galada', cursive">Galada (গলদা - Cursive Display)</option>
+              <option value="'Mina', sans-serif">Mina (মীনা)</option>
+            </optgroup>
+            <optgroup label="English / Universal">
+              <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+              <option value="'Poppins', sans-serif">Poppins</option>
+              <option value="'Inter', sans-serif">Inter</option>
+              <option value="'JetBrains Mono', monospace">JetBrains Mono</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Bengali Numerals Toggle (বাংলা সংখ্যা: ১২৩) -->
+        <div class="control-toggle">
+          <label for="chkBengaliDigits">বাংলা সংখ্যা ব্যবহার করুন (যেমন ১২০)</label>
+          <input type="checkbox" id="chkBengaliDigits">
+        </div>
+
+        <!-- Axis Rotation (Word-style 0, 45, 90 deg) -->
+        <div class="control-row">
+          <label>X-Axis Label Orientation:</label>
+          <div class="btn-group-rotation">
+            <button class="rot-btn active" data-rot="0">0° Horizontal</button>
+            <button class="rot-btn" data-rot="45">45° Slanted</button>
+            <button class="rot-btn" data-rot="90">90° Vertical</button>
+          </div>
+        </div>
+
+        <!-- Title Font Size Stepper -->
+        <div class="font-size-control">
+          <div class="control-label-row">
+            <label>Title Size (শিরোনাম)</label>
+            <span class="size-badge" id="lblTitleSize">36px</span>
+          </div>
+          <div class="stepper-slider-group">
+            <button class="btn-step" data-target="inpTitleSize" data-step="-2" title="Decrease size">−</button>
+            <input type="range" id="inpTitleSize" min="18" max="72" step="2" value="36">
+            <button class="btn-step" data-target="inpTitleSize" data-step="2" title="Increase size">+</button>
+          </div>
+        </div>
+
+        <!-- Value Label Font Size Stepper -->
+        <div class="font-size-control">
+          <div class="control-label-row">
+            <label>Value Numbers Size (মান)</label>
+            <span class="size-badge" id="lblValSize">22px</span>
+          </div>
+          <div class="stepper-slider-group">
+            <button class="btn-step" data-target="inpValSize" data-step="-1" title="Decrease size">−</button>
+            <input type="range" id="inpValSize" min="12" max="44" step="1" value="22">
+            <button class="btn-step" data-target="inpValSize" data-step="1" title="Increase size">+</button>
+          </div>
+        </div>
+
+        <!-- Axis Label Font Size Stepper -->
+        <div class="font-size-control">
+          <div class="control-label-row">
+            <label>X/Y Axis Labels (অক্ষ লেবেল)</label>
+            <span class="size-badge" id="lblAxisSize">18px</span>
+          </div>
+          <div class="stepper-slider-group">
+            <button class="btn-step" data-target="inpAxisSize" data-step="-1" title="Decrease size">−</button>
+            <input type="range" id="inpAxisSize" min="10" max="36" step="1" value="18">
+            <button class="btn-step" data-target="inpAxisSize" data-step="1" title="Increase size">+</button>
+          </div>
+        </div>
+
+        <!-- Legend Font Size Stepper -->
+        <div class="font-size-control">
+          <div class="control-label-row">
+            <label>Legend Size (সূচক চিহ্ন)</label>
+            <span class="size-badge" id="lblLegendSize">18px</span>
+          </div>
+          <div class="stepper-slider-group">
+            <button class="btn-step" data-target="inpLegendSize" data-step="-1" title="Decrease size">−</button>
+            <input type="range" id="inpLegendSize" min="10" max="32" step="1" value="18">
+            <button class="btn-step" data-target="inpLegendSize" data-step="1" title="Increase size">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DURATION & MOTION SPEED -->
+      <div class="sidebar-section">
+        <h3>⏱️ Duration & Motion Speed</h3>
+        
+        <div class="font-size-control">
+          <div class="control-label-row">
+            <label>Duration (সময়কাল)</label>
+            <span class="size-badge" id="lblDuration">5.0s</span>
+          </div>
+          <div class="stepper-slider-group">
+            <button class="btn-step" data-target="inpDuration" data-step="-0.5" title="Decrease duration">−</button>
+            <input type="range" id="inpDuration" min="1.0" max="30.0" step="0.5" value="5.0">
+            <button class="btn-step" data-target="inpDuration" data-step="0.5" title="Increase duration">+</button>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label>FPS (Frame Rate):</label>
+          <select id="selFps">
+            <option value="60" selected>60 FPS (Ultra Smooth Motion)</option>
+            <option value="30">30 FPS (Standard Broadcast)</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>Easing Curve:</label>
+          <select id="selEasing">
+            <option value="easeOutCubic" selected>Smooth Cubic (Natural & Clean)</option>
+            <option value="easeOutBack">Bouncy Spring (Dynamic Pop)</option>
+            <option value="easeOutElastic">Elastic Snap</option>
+            <option value="linear">Linear (Constant Speed)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 3D DEPTH, BACKGROUND & ALPHA STYLING -->
+      <div class="sidebar-section">
+        <h3>🎨 3D Depth & Background</h3>
+        
+        <!-- Background Mode Selector -->
+        <div class="control-row">
+          <label>Background Mode (ব্যাকগ্রাউন্ড):</label>
+          <select id="selBgMode">
+            <option value="transparent" selected>✨ 100% Transparent Alpha (Filmora/Premiere)</option>
+            <option value="chromaGreen">🟩 Chroma Green Screen (#00FF00 for CapCut)</option>
+            <option value="chromaBlue">🟦 Chroma Blue Screen (#0000FF)</option>
+            <option value="dark">⬛ Dark Stage (#0F1214)</option>
+          </select>
+        </div>
+
+        <div class="control-row">
+          <label>3D Isometric Tilt X: <span id="lblTiltX">0</span>°</label>
+          <input type="range" id="inpTiltX" min="-30" max="30" step="1" value="0">
+        </div>
+
+        <div class="control-row">
+          <label>3D Perspective Y: <span id="lblTiltY">0</span>°</label>
+          <input type="range" id="inpTiltY" min="-30" max="30" step="1" value="0">
+        </div>
+
+        <div class="control-toggle">
+          <label for="chkShadow">Drop Shadow (Realistic Depth)</label>
+          <input type="checkbox" id="chkShadow" checked>
+        </div>
+
+        <div class="control-row">
+          <label>Color Palette:</label>
+          <select id="selPalette">
+            <option value="neonCyber" selected>Neon Cyber (Modern YouTube)</option>
+            <option value="techBlue">Tech Blue (Corporate & SaaS)</option>
+            <option value="vibrantOrange">Vibrant Warmth (Engaging)</option>
+            <option value="emeraldLuxury">Emerald Wealth (Finance / ROI)</option>
+            <option value="goldSunset">Gold Sunset (Awards / Stats)</option>
+            <option value="bengaliHeritage">Bengali Heritage (লাল ও সবুজ ঐতিহ্য)</option>
+            <option value="minimalMono">Minimal Monochrome</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TEXT & LABELS -->
+      <div class="sidebar-section">
+        <h3>🏷️ Titles & Number Units</h3>
+        <div class="control-input">
+          <label>Main Title (প্রধান শিরোনাম)</label>
+          <input type="text" id="inpTitle" value="2026 Monthly Revenue">
+        </div>
+        <div class="control-input">
+          <label>Subtitle / Source (উপশিরোনাম / উৎস)</label>
+          <input type="text" id="inpSubtitle" value="Internal Performance Metrics (USD Millions)">
+        </div>
+        <div class="control-row-duo">
+          <div>
+            <label>Prefix (e.g. $, ৳, ₹)</label>
+            <input type="text" id="inpPrefix" value="$">
+          </div>
+          <div>
+            <label>Suffix (e.g. M, %, কোটি, লাখ)</label>
+            <input type="text" id="inpSuffix" value="M">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER PREVIEW & SPREADSHEET -->
+    <section class="preview-stage" id="previewStageContainer">
+      <div class="stage-topbar">
+        <div class="stage-info">
+          <span class="badge" id="badgeResolution">1920 × 1080 (FHD)</span>
+          <span class="badge-accent" id="badgeAlpha">ALPHA TRANSPARENT</span>
+          <span class="badge" id="badgeCurrentType">Column Bar</span>
+          <span class="badge-font" id="badgeCurrentFont">Noto Sans Bengali</span>
+          <span class="badge-recommend" id="badgeRecommend" style="display: none;">✨ Auto-Fit Selected</span>
+        </div>
+        <div class="stage-view-toggles">
+          <button id="btnBgToggle" class="btn btn-sm btn-outline" title="Toggle Preview Backdrop">
+            🏁 Checkerboard
+          </button>
+        </div>
+      </div>
+
+      <!-- CANVAS PREVIEW CONTAINER -->
+      <div class="canvas-viewport checkerboard" id="canvasViewport">
+        <canvas id="previewCanvas" width="1920" height="1080"></canvas>
+      </div>
+
+      <!-- TIMELINE SCRUBBER -->
+      <div class="timeline-bar">
+        <button id="btnPlay" class="play-btn" title="Play / Pause">▶</button>
+        <button id="btnRewind" class="btn btn-sm btn-icon" title="Rewind">⏮</button>
+        <div class="scrubber-track">
+          <input type="range" id="timelineScrubber" min="0" max="300" value="300">
+        </div>
+        <div class="timeline-time">
+          <span id="timeCurrent">05.00s</span> / <span id="timeTotal">05.00s</span>
+        </div>
+      </div>
+
+      <!-- BOTTOM DATA TABLE & CSV UPLOADER -->
+      <div class="data-table-container" id="dataTableContainer">
+        <div class="table-header">
+          <div class="table-title-group">
+            <h4>📋 Live Data Spreadsheet (ডেটা এডিটর)</h4>
+            <span class="table-hint">Edit values or upload any CSV file below</span>
+          </div>
+          <div class="table-actions">
+            <label class="btn btn-sm btn-secondary file-upload-btn" title="Upload a CSV with Bengali or English data">
+              📁 Upload CSV
+              <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display: none;">
+            </label>
+            <button id="btnDownloadSampleCsv" class="btn btn-sm btn-outline" title="Download English sample CSV">
+              📥 Sample CSV
+            </button>
+            <button id="btnDownloadBengaliCsv" class="btn btn-sm btn-outline" title="বাংলা স্যাম্পল CSV ডাউনলোড করুন">
+              📥 বাংলা CSV
+            </button>
+            <button id="btnAddRow" class="btn btn-sm btn-outline">+ Add Row</button>
+            <button id="btnPresetData" class="btn btn-sm btn-outline">🎲 Random Sample</button>
+          </div>
+        </div>
+
+        <div class="table-scroll" id="dropZoneContainer">
+          <table id="dataTable">
+            <thead>
+              <tr>
+                <th width="32%">Category / Label (ক্যাটাগরি)</th>
+                <th width="28%">Primary Value (মান ১)</th>
+                <th width="22%">Secondary Value (মান ২ - ঐচ্ছিক)</th>
+                <th width="10%">Color (রং)</th>
+                <th width="8%">Action</th>
+              </tr>
+            </thead>
+            <tbody id="dataTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- UNIVERSAL EXPORT MODAL (Supports both Web Hosting & Local Daemon) -->
+  <div class="modal-overlay" id="exportModal">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3 id="exportModalTitle">🎬 Export Transparent Chart</h3>
+        <button class="modal-close" id="btnCloseExportModal">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Render Progress View -->
+        <div id="exportProgressBox">
+          <p id="exportStatusText">Preparing export formats...</p>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="exportProgressBar" style="width: 0%"></div>
+          </div>
+          <div class="progress-stats">
+            <span id="exportFrameCounter">Frame 0 / 300</span>
+            <span id="exportPercent">0%</span>
+          </div>
+        </div>
+
+        <!-- COMPLETION BOX (Downloads & Options) -->
+        <div id="exportSuccessCard" class="export-success-card" style="display: none;">
+          <div class="success-banner">
+            <span class="success-icon">✨</span>
+            <div>
+              <strong>Export Ready!</strong>
+              <div id="exportRenderTimeText" class="success-subtitle">Generated in 1.8s</div>
+            </div>
+          </div>
+
+          <!-- DIRECT DOWNLOAD OPTIONS GRID -->
+          <div class="download-options-group">
+            <div class="download-label">Choose Your Video Editor Format (ডাউনলোড অপশন):</div>
+            <div class="download-cards-grid">
+              <!-- Option 1: PNG Sequence ZIP -->
+              <div class="download-card dl-card-zip">
+                <div class="card-head">
+                  <span class="card-icon">📦</span>
+                  <div>
+                    <div class="card-title">Transparent PNG Sequence (.ZIP)</div>
+                    <div class="card-badge">Universal • 100% Alpha</div>
+                  </div>
+                </div>
+                <div class="card-desc">Full 60fps transparent frame sequence. Works in Filmora, Premiere, CapCut PC, and AE without server.</div>
+                <button id="btnTriggerZipDl" class="btn btn-sm btn-primary">Download Sequence (.zip)</button>
+              </div>
+
+              <!-- Option 2: Single High-Res PNG -->
+              <div class="download-card dl-card-png">
+                <div class="card-head">
+                  <span class="card-icon">🖼️</span>
+                  <div>
+                    <div class="card-title">Single Transparent PNG</div>
+                    <div class="card-badge">Current Frame • 1920×1080</div>
+                  </div>
+                </div>
+                <div class="card-desc">Instant 1-click snapshot of the current chart frame with transparent background.</div>
+                <button id="btnTriggerSinglePngDl" class="btn btn-sm btn-secondary">Download Snapshot (.png)</button>
+              </div>
+
+              <!-- Option 3: WebM Alpha Video -->
+              <div class="download-card dl-card-webm">
+                <div class="card-head">
+                  <span class="card-icon">🎥</span>
+                  <div>
+                    <div class="card-title">Alpha Video (.WEBM)</div>
+                    <div class="card-badge">Direct Overlay</div>
+                  </div>
+                </div>
+                <div class="card-desc">Transparent video encoded directly in browser. Drag & drop onto Premiere, DaVinci, or Filmora.</div>
+                <button id="btnTriggerWebmDl" class="btn btn-sm btn-accent">Download Alpha Video (.webm)</button>
+              </div>
+
+              <!-- Option 4: Green Screen Chroma Key Video -->
+              <div class="download-card dl-card-green">
+                <div class="card-head">
+                  <span class="card-icon">🟩</span>
+                  <div>
+                    <div class="card-title">Green Screen Video</div>
+                    <div class="card-badge">Mobile CapCut & Kinemaster</div>
+                  </div>
+                </div>
+                <div class="card-desc">Chroma-key ready video for CapCut Mobile & smartphones. 1-tap cutout in any phone editor.</div>
+                <button id="btnTriggerGreenDl" class="btn btn-sm btn-outline">Download Chroma Video</button>
+              </div>
+
+              <!-- Option 5: Apple ProRes 4444 (Server Mode) -->
+              <div class="download-card dl-card-mov" id="cardProres">
+                <div class="card-head">
+                  <span class="card-icon">🎬</span>
+                  <div>
+                    <div class="card-title">Apple ProRes 4444 (.MOV)</div>
+                    <div class="card-badge" id="badgeProresStatus">Local FFmpeg</div>
+                  </div>
+                </div>
+                <div class="card-desc" id="descProres">Broadcast straight alpha video via local node daemon. Zero keying required.</div>
+                <button id="btnTriggerMovDl" class="btn btn-sm btn-primary">Download ProRes (.mov)</button>
+              </div>
+
+              <!-- Option 6: Project JSON -->
+              <div class="download-card dl-card-json">
+                <div class="card-head">
+                  <span class="card-icon">💾</span>
+                  <div>
+                    <div class="card-title">Project Specification (.JSON)</div>
+                    <div class="card-badge">Editable Source</div>
+                  </div>
+                </div>
+                <div class="card-desc">Save complete chart configuration to reload and modify anytime in ChartCraft Studio.</div>
+                <button id="btnTriggerJsonDl" class="btn btn-sm btn-secondary">Download Spec (.json)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOCAL DISK PATH (If running with local server) -->
+          <div class="save-path-box" id="boxServerPath" style="display: none;">
+            <div class="path-label">📁 Exact File Location on Disk:</div>
+            <div class="path-display-row">
+              <input type="text" id="txtExportFolderPath" readonly value="">
+              <button id="btnCopyPath" class="btn btn-sm btn-primary" title="Copy exact path to clipboard">📋 Copy Path</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" id="exportModalFooter" style="display: none;">
+        <button id="btnCloseModal" class="btn btn-secondary">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVED PROJECTS MODAL -->
+  <div class="modal-overlay" id="projectsModal">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>📂 Saved Chart Projects</h3>
+        <button class="modal-close" id="btnCloseProjects">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="projectsList" class="projects-grid">
+          <!-- Populated from server / local storage -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="jszip.min.js"></script>
+  <script src="chart_engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
