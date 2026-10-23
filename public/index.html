@@ -464,17 +464,17 @@
                 <button id="btnTriggerGreenDl" class="btn btn-sm btn-outline">Download Chroma Video</button>
               </div>
 
-              <!-- Option 5: Apple ProRes 4444 (Server Mode) -->
+              <!-- Option 5: QuickTime Transparent .MOV (Dual-Mode: Local FFmpeg or In-Browser) -->
               <div class="download-card dl-card-mov" id="cardProres">
                 <div class="card-head">
                   <span class="card-icon">🎬</span>
                   <div>
-                    <div class="card-title">Apple ProRes 4444 (.MOV)</div>
-                    <div class="card-badge" id="badgeProresStatus">Local FFmpeg</div>
+                    <div class="card-title">Transparent Video (.MOV)</div>
+                    <div class="card-badge" id="badgeProresStatus">QuickTime Alpha</div>
                   </div>
                 </div>
-                <div class="card-desc" id="descProres">Broadcast straight alpha video via local node daemon. Zero keying required.</div>
-                <button id="btnTriggerMovDl" class="btn btn-sm btn-primary">Download ProRes (.mov)</button>
+                <div class="card-desc" id="descProres">Direct .MOV with 100% straight alpha channel. Works seamlessly in browser on GitHub Pages & local server!</div>
+                <button id="btnTriggerMovDl" class="btn btn-sm btn-primary">Download Transparent (.mov)</button>
               </div>
 
               <!-- Option 6: Project JSON -->
@@ -526,6 +526,7 @@
 
   <!-- SCRIPTS -->
   <script src="jszip.min.js"></script>
+  <script src="quicktime_mov.js"></script>
   <script src="chart_engine.js"></script>
   <script src="app.js"></script>
 </body>
