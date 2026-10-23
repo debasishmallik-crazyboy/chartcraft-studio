@@ -166,7 +166,6 @@ window.ChartEngine = (function () {
       ctx.restore();
     }
   }
-  }
 
   // --- 1. COLUMN BAR CHART ---
   function drawBarChart(ctx, width, height, progress, config) {
@@ -727,9 +726,6 @@ window.ChartEngine = (function () {
       ctx.textBaseline = 'middle';
       ctx.fillText(formatValue(val, config), left - 15, y);
     }
-    ctx.setLineDash([]);
-    ctx.restore();
-  }
     ctx.setLineDash([]);
     ctx.restore();
   }
